@@ -1,0 +1,130 @@
+
+full_path_regex:
+  - ['\b5\.1\b', '']
+  - ['\.', ' ']
+  # Add dot to extension after it was converted to a space
+  - [' (\S+)$', '.$1']
+  # Remove any parenthesis
+  - ['[\(\)]', '']
+  # Convert english at the end of subtitle to use the 
+  # 'en' code instead.
+  - ['(?i)(?:\s*-\s*)?ENG(?:LISH)?\.(\S+)$', '.en.$1']
+  # Remove various keywords
+  - ['(?i)\bCOMPLETE\b', '']
+  - ['(?i)\bWEBRIP\b', '']
+  - ['(?i)\bWEB\b', '']
+  - ['(?i)\b6CH\b', '']
+  - ['(?i)\bAC3\b', '']
+  - ['(?i)\bAC5([\s\.]1)?\b', '']
+  - ['(?i)\bDD5([\s\.]1)?\b', '']
+  - ['(?i)\bDTS-HD\b', '']
+  - ['(?i)\bBLURAY\b', '']
+  - ['(?i)\bBRRIP\b', '']
+  - ['(?i)\bAMZN\b', '']
+  - ['(?i)\bAMAZON\b', '']
+  - ['(?i)\bMONOLITH\b', '']
+  - ['(?i)\bBONE\b', '']
+  - ['(?i)\bREPACK\b', '']
+  - ['(?i)\bNF\b', '']
+  - ['(?i)\bMOMOLITH\b', '']
+  - ['(?i)\bHEVC\b', '']
+  - ['(?i)\b10bit\b', '']
+  - ['(?i)\baac\b', '']
+  - ['(?i)\bMVGroup(\sorg)?\b', '']
+  - ['(?i)\bDTS-WIKI\b', '']
+  - ['(?i)\bYTS(\sMX)?\b', '']
+  - ['(?i)\bEZTV(\sRE)?\b', '']
+  - ['(?i)\bTGX\b', '']
+  - ['(?i)\-?YIFY(\+HI)?\b', '']
+  - ['(?i)\-?ETRG\b', '']
+  - ['(?i)\-?BOKUTOX\b', '']
+  - ['(?i)\-?CINEFILE\b', '']
+  - ['(?i)\-?JYK\b', '']
+  - ['(?i)\-?SECRECY\b', '']
+  - ['(?i)\-?t3nzin\b', '']
+  - ['(?i)\-?DL\b', '']
+  - ['(?i)\-?MIU\b', '']
+  - ['(?i)\-?GRYM\b', '']
+  - ['(?i)\-?PSA\b', '']
+  - ['(?i)\-?RARBG\b', '']
+  - ['(?i)\-?HULU\b', '']
+  - ['(?i)\-?KOGI\b', '']
+  - ['(?i)\-?GalaxyTV\b', '']
+  - ['(?i)\-?BIGDOC\b', '']
+  - ['(?i)\bMP4([^$])', '$1']
+  - ['(?i)\bEng\b', '']
+  - ['(?i)\bIta\b', '']
+  - ['(?i)\bMulti-Subs\b', '']
+  - ['(?i)(\d+\sPart\s)?\bMini[-\s]Series\b', '']
+  - ['(?i)(\s*-\s*)?\bStephen King\b', '']
+  # Add parenthases to years
+  - ['\(?(((20)|(19))\d{2})\)?', '($1)']
+        
+
+base_file_regex:
+  # Convert season episode format from 00x00 to S00E00
+  - ['(?i)\bS?(\d{1,2})xE?(\d{1,2})\b', 'S${1}E${2}']
+  # Ensure season identification is only an 'S'
+  - ['(?i)\bS(?:(?i)eason(?-i))?\s*(\d+)\b', 'S$1']
+  # Ensure season identification has two digits
+  - ['(?i)\bS(\d)\b', 'S0$1']
+  # Ensure episode identification is only an 'E'
+  - ['(?i)\bE(?:pisode)?\s*(\d+)\b', 'E$1']
+  # Ensure episode identification has two digits
+  - ['(?i)\bE(\d)\b', 'E0$1']
+  # Ensure the season and episode are joined
+  - ['(?i)\b(S\d{2})(.*)(E\d{2})\b', '$2$1$3']
+    # If the order is reversed
+  - ['(?i)\b(E\d{2})(.*)(S\d{2})\b', '$2$3$1']
+  # Add the dashes to the episode
+  - ['(?i)\s*-?\s*(S\d{2}E\d{2})\s*-?\s*', ' - $1 - ']
+  # Join video codec if space is within designator
+  # I.g 'h 264' ==> 'h264
+  - ['(?i)\b([hx])\s+(26[45])\b', '$1$2']
+  # Convert video codec to use lower case h identifier
+  - ['\bH(26[45])\b', 'h$1']
+  # Convert video codec to use lower case x identifier
+  - ['\bX(26[45])\b', 'x$1']
+  # Move codec information into brackets
+  - ['(?i)\b(?:\s*\[)?([hx]26[45])(?:\s*\])?\b', '[$1]']
+  # Move resolution information into brackets
+  - ['(?i)\b(?:\s*\[)?(\d+p)(?:\s*\])?\b', '[$1]']
+
+directory_regex:
+  # Remove various keywords
+  - ['(?i)\b\d+p\b', '']
+  # Remove all square brakets and their contents
+  - ['\[[^\]]*\]', '']
+  # Remove codec information
+  - ['(?i)\b([hx]26[45])', '']
+  # Remove resolution information
+  - ['(?i)\b(\d+p)', '']
+  # Remove a season range identifier
+  - ['(?i)(S(eason)?\s*)\d+\s*[-]\s*(S(eason)?\s*)?\d+', '']
+  # If the Season information comes with the episode
+  # Information, then remove the episode info. 
+  - ['(S(?:(?i)eason(?-i))?\s*(\d+))\s*E(?:(?i)pisode(?-i))?\s*\d+\b', '$1']
+  # Ensure season identification has more than
+  # one digit
+  - ['(?i)\bS(?:(?i)eason(?-i))?\s*(\d)\b', 'Season 0$1']
+  # Ensure season identification is in a directory of its own
+  - ['(?i)\bS(?:(?i)eason(?-i))?\s*(\d{2})\b', '/Season $1/']
+  # If there is a season directory, remove everything after it
+  - ['(/Season \d+/).*', '$1']
+  # Remove a year range
+  - ['(\(((20)|(19))\d{2}\))\s*-\s*(\(((20)|(19))\d{2}\))', '']
+  # Remove the subs directory if found.
+  - ['/\s*-?\s*(?i)sub(title)?s\s*-?\s*/?', '/']
+
+post_processing_regex:
+  # Remove empty brackets
+  - ['(?i)\b\[\s*\]\b', '']
+  # Convert two or more spaces to a single space
+  - ['\s{2,}', ' ']
+  # Remove any whitespace or dashes around 
+  # slashes
+  - ['\s*-?\s*/\s*-?\s*', '/']
+  # Remove any duplicate slashes
+  - ['/{2,}', '/']
+  # Remove whitespace before the extension
+  - ['\s+(\.\S+)$', '$1']
